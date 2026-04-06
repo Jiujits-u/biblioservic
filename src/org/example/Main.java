@@ -1,6 +1,5 @@
 package org.example;
 
-import org.example.model.DictionaryEntry;
 import org.example.service.FileDictionaryService;
 import org.example.validator.LatinKeyValidator;
 
@@ -13,24 +12,24 @@ public class Main {
 
         service.loadFromFile();
 
-        System.out.println("All entries:");
+        System.out.println("Before adding:");
         service.getAll().forEach(System.out::println);
 
-        System.out.println("\nSearch by key 'qwer':");
-        DictionaryEntry found = service.findByKey("qwer");
-        if (found != null) {
-            System.out.println(found);
-        } else {
-            System.out.println("Entry not found");
-        }
+        System.out.println("\nAdd valid entry 'zxcv' = 'newWord':");
+        boolean added1 = service.addEntry("zxcv", "newWord");
+        System.out.println("Added: " + added1);
 
-        System.out.println("\nRemove key 'test':");
-        boolean removed = service.removeByKey("test");
-        System.out.println("Removed: " + removed);
+        System.out.println("\nAdd duplicate key 'abcd':");
+        boolean added2 = service.addEntry("abcd", "duplicate");
+        System.out.println("Added: " + added2);
+
+        System.out.println("\nAdd invalid key 'abc12':");
+        boolean added3 = service.addEntry("abc12", "wrong");
+        System.out.println("Added: " + added3);
 
         service.saveToFile();
 
-        System.out.println("\nEntries after удаления:");
+        System.out.println("\nAfter adding:");
         service.getAll().forEach(System.out::println);
     }
 }

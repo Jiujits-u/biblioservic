@@ -73,6 +73,10 @@ public class FileDictionaryService implements DictionaryService {
             return false;
         }
 
+        if (findByKey(key) != null) {
+            return false;
+        }
+
         entries.add(new DictionaryEntry(key, value));
         return true;
     }

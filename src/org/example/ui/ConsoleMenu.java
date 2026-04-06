@@ -22,76 +22,84 @@ public class ConsoleMenu {
         digitService.loadFromFile();
 
         while (true) {
-            System.out.println("\n===== Dictionary Service =====");
-            System.out.println("1. Show latin dictionary");
-            System.out.println("2. Show digit dictionary");
-            System.out.println("3. Add entry to latin dictionary");
-            System.out.println("4. Add entry to digit dictionary");
-            System.out.println("5. Find in latin dictionary");
-            System.out.println("6. Find in digit dictionary");
-            System.out.println("7. Remove from latin dictionary");
-            System.out.println("8. Remove from digit dictionary");
-            System.out.println("9. Show both dictionaries");
-            System.out.println("0. Exit");
+            System.out.println("\n===== Сервис словарей =====");
+            System.out.println("1. Показать оба словаря");
+            System.out.println("2. Выбрать латинский словарь");
+            System.out.println("3. Выбрать цифровой словарь");
+            System.out.println("0. Выход");
+            System.out.print("Выберите действие: ");
 
-            System.out.print("Choose: ");
-            String choice = scanner.nextLine();
+            String choice = scanner.nextLine().trim();
 
             switch (choice) {
                 case "1":
-                    printDictionary("Latin dictionary", latinService);
+                    printDictionary("Латинский словарь", latinService);
+                    printDictionary("Цифровой словарь", digitService);
                     break;
                 case "2":
-                    printDictionary("Digit dictionary", digitService);
+                    dictionaryActions("Латинский словарь", latinService);
                     break;
                 case "3":
-                    addEntry(latinService);
-                    break;
-                case "4":
-                    addEntry(digitService);
-                    break;
-                case "5":
-                    findEntry(latinService);
-                    break;
-                case "6":
-                    findEntry(digitService);
-                    break;
-                case "7":
-                    removeEntry(latinService);
-                    break;
-                case "8":
-                    removeEntry(digitService);
-                    break;
-                case "9":
-                    printDictionary("Latin dictionary", latinService);
-                    printDictionary("Digit dictionary", digitService);
+                    dictionaryActions("Цифровой словарь", digitService);
                     break;
                 case "0":
                     latinService.saveToFile();
                     digitService.saveToFile();
-                    System.out.println("Program finished");
+                    System.out.println("Работа программы завершена.");
                     return;
                 default:
-                    System.out.println("Wrong choice");
+                    System.out.println("Некорректный выбор.");
+            }
+        }
+    }
+
+    private void dictionaryActions(String title, FileDictionaryService service) {
+        while (true) {
+            System.out.println("\n--- " + title + " ---");
+            System.out.println("1. Показать содержимое");
+            System.out.println("2. Добавить запись");
+            System.out.println("3. Найти запись по ключу");
+            System.out.println("4. Удалить запись по ключу");
+            System.out.println("0. Назад");
+            System.out.print("Выберите действие: ");
+
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    printDictionary(title, service);
+                    break;
+                case "2":
+                    addEntry(service);
+                    break;
+                case "3":
+                    findEntry(service);
+                    break;
+                case "4":
+                    removeEntry(service);
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Некорректный выбор.");
             }
         }
     }
 
     private void addEntry(FileDictionaryService service) {
-
-        System.out.print("Enter key: ");
+        System.out.print("Введите ключ: ");
         String key = scanner.nextLine().trim();
 
         if (key.isEmpty()) {
-            System.out.println("Key cannot be empty");
+            System.out.println("Ключ не может быть пустым.");
             return;
         }
 
-        System.out.print("Enter value: ");
+        System.out.print("Введите перевод: ");
         String value = scanner.nextLine().trim();
 
         if (value.isEmpty()) {
-            System.out.println("Value cannot be empty");
+            System.out.println("Значение не может быть пустым.");
             return;
         }
 
@@ -99,38 +107,36 @@ public class ConsoleMenu {
 
         if (added) {
             service.saveToFile();
-            System.out.println("Entry added successfully");
+            System.out.println("Запись успешно добавлена.");
         } else {
-            System.out.println("Invalid key format or duplicate key");
+            System.out.println("Ключ не соответствует формату или уже существует.");
         }
     }
 
     private void findEntry(FileDictionaryService service) {
-
-        System.out.print("Enter key to find: ");
+        System.out.print("Введите ключ для поиска: ");
         String key = scanner.nextLine().trim();
 
         if (key.isEmpty()) {
-            System.out.println("Key cannot be empty");
+            System.out.println("Ключ не может быть пустым.");
             return;
         }
 
         DictionaryEntry entry = service.findByKey(key);
 
         if (entry != null) {
-            System.out.println("Found: " + entry);
+            System.out.println("Найдено: " + entry);
         } else {
-            System.out.println("Entry not found");
+            System.out.println("Запись не найдена.");
         }
     }
 
     private void removeEntry(FileDictionaryService service) {
-
-        System.out.print("Enter key to remove: ");
+        System.out.print("Введите ключ для удаления: ");
         String key = scanner.nextLine().trim();
 
         if (key.isEmpty()) {
-            System.out.println("Key cannot be empty");
+            System.out.println("Ключ не может быть пустым.");
             return;
         }
 
@@ -138,19 +144,22 @@ public class ConsoleMenu {
 
         if (removed) {
             service.saveToFile();
-            System.out.println("Entry removed");
+            System.out.println("Запись удалена.");
         } else {
-            System.out.println("Entry not found");
+            System.out.println("Запись не найдена.");
         }
     }
+
     private void printDictionary(String title, FileDictionaryService service) {
         System.out.println("\n--- " + title + " ---");
 
         if (service.getAll().isEmpty()) {
-            System.out.println("Dictionary is empty");
+            System.out.println("Словарь пуст.");
             return;
         }
 
-        service.getAll().forEach(System.out::println);
+        for (DictionaryEntry entry : service.getAll()) {
+            System.out.println(entry);
+        }
     }
 }

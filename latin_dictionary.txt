@@ -1,4 +1,4 @@
-abcd=hello
-qwer=world
-zxcv=newWord
-asdf=lotus
+abcd=привет
+qwer=скибиди
+zxcv=планета
+asdf=река

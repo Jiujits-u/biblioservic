@@ -22,7 +22,7 @@ public class ConsoleMenu {
         digitService.loadFromFile();
 
         while (true) {
-            System.out.println("\n=== Dictionary Menu ===");
+            System.out.println("\n===== Dictionary Service =====");
             System.out.println("1. Show latin dictionary");
             System.out.println("2. Show digit dictionary");
             System.out.println("3. Add entry to latin dictionary");
@@ -78,25 +78,42 @@ public class ConsoleMenu {
     }
 
     private void addEntry(FileDictionaryService service) {
+
         System.out.print("Enter key: ");
-        String key = scanner.nextLine();
+        String key = scanner.nextLine().trim();
+
+        if (key.isEmpty()) {
+            System.out.println("Key cannot be empty");
+            return;
+        }
 
         System.out.print("Enter value: ");
-        String value = scanner.nextLine();
+        String value = scanner.nextLine().trim();
+
+        if (value.isEmpty()) {
+            System.out.println("Value cannot be empty");
+            return;
+        }
 
         boolean added = service.addEntry(key, value);
 
         if (added) {
             service.saveToFile();
-            System.out.println("Added");
+            System.out.println("Entry added successfully");
         } else {
-            System.out.println("Invalid key or duplicate");
+            System.out.println("Invalid key format or duplicate key");
         }
     }
 
     private void findEntry(FileDictionaryService service) {
+
         System.out.print("Enter key to find: ");
-        String key = scanner.nextLine();
+        String key = scanner.nextLine().trim();
+
+        if (key.isEmpty()) {
+            System.out.println("Key cannot be empty");
+            return;
+        }
 
         DictionaryEntry entry = service.findByKey(key);
 
@@ -108,19 +125,24 @@ public class ConsoleMenu {
     }
 
     private void removeEntry(FileDictionaryService service) {
+
         System.out.print("Enter key to remove: ");
-        String key = scanner.nextLine();
+        String key = scanner.nextLine().trim();
+
+        if (key.isEmpty()) {
+            System.out.println("Key cannot be empty");
+            return;
+        }
 
         boolean removed = service.removeByKey(key);
 
         if (removed) {
             service.saveToFile();
-            System.out.println("Removed");
+            System.out.println("Entry removed");
         } else {
             System.out.println("Entry not found");
         }
     }
-
     private void printDictionary(String title, FileDictionaryService service) {
         System.out.println("\n--- " + title + " ---");
 

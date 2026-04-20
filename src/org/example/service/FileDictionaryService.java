@@ -14,18 +14,27 @@ public class FileDictionaryService implements DictionaryService {
     private final String filePath;
     private final KeyValidator validator;
 
+    private boolean fileMatchesValidator = true;
+
     public FileDictionaryService(String filePath, KeyValidator validator) {
         this.filePath = filePath;
         this.validator = validator;
     }
 
+    public boolean isFileMatchesValidator() {
+        return fileMatchesValidator;
+    }
+
     @Override
     public void loadFromFile() {
         entries.clear();
+        fileMatchesValidator = true;
 
         File file = new File(filePath);
+
         if (!file.exists()) {
-            System.out.println("Файл " + filePath + " не найден, будет создан новый словарь.");
+            System.out.println("Файл не найден: " + filePath);
+            fileMatchesValidator = false;
             return;
         }
 
@@ -35,9 +44,8 @@ public class FileDictionaryService implements DictionaryService {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
+
+                if (line.trim().isEmpty()) continue;
 
                 String[] parts = line.split("=", 2);
 
@@ -46,13 +54,22 @@ public class FileDictionaryService implements DictionaryService {
                     String value = parts[1].trim();
 
                     if (!key.isEmpty() && !value.isEmpty()) {
-                        entries.add(new DictionaryEntry(key, value));
+
+                        if (validator.isValid(key)) {
+                            entries.add(new DictionaryEntry(key, value));
+                        } else {
+                            System.out.println("Файл не соответствует выбранному типу словаря.");
+                            entries.clear();
+                            fileMatchesValidator = false;
+                            return;
+                        }
                     }
                 }
             }
 
         } catch (IOException e) {
             System.out.println("Ошибка чтения файла: " + filePath);
+            fileMatchesValidator = false;
         }
     }
 

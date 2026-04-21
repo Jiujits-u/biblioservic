@@ -49,9 +49,6 @@ public class ConsoleMenu {
 
         service.loadFromFile();
 
-        if (!service.isFileMatchesValidator()) {
-            return;
-        }
 
         while (true) {
             System.out.println("\n--- " + title + " ---");

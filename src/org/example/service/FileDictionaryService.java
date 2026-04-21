@@ -11,30 +11,25 @@ import java.util.List;
 public class FileDictionaryService implements DictionaryService {
 
     private final List<DictionaryEntry> entries = new ArrayList<>();
+    private final List<String> otherLines = new ArrayList<>();
+
     private final String filePath;
     private final KeyValidator validator;
-
-    private boolean fileMatchesValidator = true;
 
     public FileDictionaryService(String filePath, KeyValidator validator) {
         this.filePath = filePath;
         this.validator = validator;
     }
 
-    public boolean isFileMatchesValidator() {
-        return fileMatchesValidator;
-    }
-
     @Override
     public void loadFromFile() {
         entries.clear();
-        fileMatchesValidator = true;
+        otherLines.clear();
 
         File file = new File(filePath);
 
         if (!file.exists()) {
             System.out.println("Файл не найден: " + filePath);
-            fileMatchesValidator = false;
             return;
         }
 
@@ -44,8 +39,10 @@ public class FileDictionaryService implements DictionaryService {
             String line;
 
             while ((line = reader.readLine()) != null) {
-
-                if (line.trim().isEmpty()) continue;
+                if (line.trim().isEmpty()) {
+                    otherLines.add(line);
+                    continue;
+                }
 
                 String[] parts = line.split("=", 2);
 
@@ -53,23 +50,18 @@ public class FileDictionaryService implements DictionaryService {
                     String key = parts[0].trim();
                     String value = parts[1].trim();
 
-                    if (!key.isEmpty() && !value.isEmpty()) {
-
-                        if (validator.isValid(key)) {
-                            entries.add(new DictionaryEntry(key, value));
-                        } else {
-                            System.out.println("Файл не соответствует выбранному типу словаря.");
-                            entries.clear();
-                            fileMatchesValidator = false;
-                            return;
-                        }
+                    if (!key.isEmpty() && !value.isEmpty() && validator.isValid(key)) {
+                        entries.add(new DictionaryEntry(key, value));
+                    } else {
+                        otherLines.add(line);
                     }
+                } else {
+                    otherLines.add(line);
                 }
             }
 
         } catch (IOException e) {
             System.out.println("Ошибка чтения файла: " + filePath);
-            fileMatchesValidator = false;
         }
     }
 
@@ -80,6 +72,11 @@ public class FileDictionaryService implements DictionaryService {
 
             for (DictionaryEntry entry : entries) {
                 writer.write(entry.getKey() + "=" + entry.getValue());
+                writer.newLine();
+            }
+
+            for (String line : otherLines) {
+                writer.write(line);
                 writer.newLine();
             }
 
